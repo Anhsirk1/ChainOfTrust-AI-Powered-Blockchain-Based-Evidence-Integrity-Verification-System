@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+</head>
+
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🛡️</div>
+            <div>
+                <h2>Admin Panel</h2>
+                <p>Evidence Management System</p>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('overview', event)">📊 Overview</div>
+            <div class="nav-item" onclick="switchTab('add_user', event)">➕ Add User</div>
+            <div class="nav-item" onclick="switchTab('all_users', event)">👥 Manage Users</div>
+            <div class="nav-item" onclick="switchTab('roles', event)">🔒 Roles & Permissions</div>
+            <div class="nav-item" onclick="switchTab('logs', event)">📝 Logs</div>
+            <div class="nav-item" onclick="switchTab('evidence', event)">📁 Evidence</div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('controllers.logout') }}" class="nav-item">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Dashboard</h1>
+                <p class="header-subtitle">
+                    System overview, user control, and evidence governance
+                </p>
+            </div>
+
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="Search users, cases...">
+                </div>
+                <button class="icon-btn">🔔</button>
+                <div class="profile">
+                    <div class="avatar">AD</div>
+                    <div>
+                        <div class="name">Admin User</div>
+                        <div class="role">Super Admin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <section class="content">
+
+            <!-- OVERVIEW -->
+            <div id="overview" class="tab active-tab">
+                <div class="stats">
+                    <div class="card">
+                        <h3>Total Users</h3>
+                        <p class="value">{{ users|length if users else 0 }}</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Pending Evidence</h3>
+                        <p class="value">17</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Security Alerts</h3>
+                        <p class="value">4</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADD USER -->
+            <div id="add_user" class="tab">
+                <div class="form-card">
+                    <h2>Add New User</h2>
+
+                    <form method="POST" action="{{ url_for('controllers.add_user') }}">
+
+                        <label>Full Name</label>
+                        <input type="text" name="fullname" required>
+
+                        <label>Email</label>
+                        <input type="email" name="email" required>
+
+                        <label>Password</label>
+                        <input type="password" name="password" required>
+
+                        <label>Department</label>
+                        <select id="department"  name="department" onchange="updateRoles()" required>
+                            <option value="">-- Select Department --</option>
+                            <option value="police">Police</option>
+                            <option value="forensic">Forensic</option>
+                            <option value="court">Court</option>
+                            <option value="prosecution">Prosecution</option>
+                        </select>
+
+                        <label>Role</label>
+                        <select id="role" name="designation" required>
+                            <option value="">-- Select Role --</option>
+                        </select>
+
+                        <button type="submit">Create User</button>
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- PLACEHOLDERS -->
+            <div id="all_users" class="tab"></div>
+            <div id="roles" class="tab"></div>
+            <div id="logs" class="tab"></div>
+            <div id="evidence" class="tab"></div>
+
+        </section>
+    </main>
+</div>
+
+<!-- SCRIPT -->
+<script>
+function switchTab(tabId, event) {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active-tab"));
+    document.getElementById(tabId).classList.add("active-tab");
+
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    event.currentTarget.classList.add("active");
+}
+
+/* INDIAN ROLE HIERARCHY */
+const rolesByDepartment = {
+    police: [
+        "Police Constable (PC)",
+        "Head Constable (HC)",
+        "Assistant Sub-Inspector (ASI)",
+        "Sub-Inspector (SI)",
+        "Inspector of Police (IP)",
+        "Deputy Superintendent of Police (DSP)",
+        "Additional Superintendent of Police (Addl. SP)",
+        "Superintendent of Police (SP)",
+        "Senior Superintendent of Police (SSP)",
+        "Deputy Inspector General of Police (DIG)",
+        "Inspector General of Police (IG)",
+        "Additional Director General of Police (ADGP)",
+        "Director General of Police (DGP)"
+    ],
+    forensic: [
+        "Forensic Assistant (FA)",
+        "Forensic Technician (FT)",
+        "Junior Forensic Scientist (JFS)",
+        "Forensic Scientist (FS)",
+        "Senior Forensic Scientist (SFS)",
+        "Digital Forensic Analyst (DFA)",
+        "Cyber Forensic Expert (CFE)",
+        "Chief Forensic Scientist (CFS)",
+        "Director, Forensic Science Laboratory (Director FSL)"
+    ],
+    court: [
+        "Court Clerk (CC)",
+        "Bench Clerk (BC)",
+        "Judicial Magistrate First Class (JMFC)",
+        "Chief Judicial Magistrate (CJM)",
+        "Civil Judge (CJ)",
+        "District and Sessions Judge (DSJ)",
+        "Principal District Judge (PDJ)",
+        "Court Registrar (CR)",
+        "Registrar General, High Court (RGHC)"
+    ],
+    prosecution: [
+        "Assistant Public Prosecutor (APP)",
+        "Public Prosecutor (PP)",
+        "Senior Public Prosecutor (Sr. PP)",
+        "Special Public Prosecutor (SPP)",
+        "Director of Prosecution (DoP)"
+    ]
+};
+
+function updateRoles() {
+    const dept = document.getElementById("department").value;
+    const roleSelect = document.getElementById("role");
+    roleSelect.innerHTML = '<option value="">-- Select Role --</option>';
+
+    if (!dept) return;
+
+    rolesByDepartment[dept].forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r;
+        opt.textContent = r;
+        roleSelect.appendChild(opt);
+    });
+}
+</script>
+
+</body>
+</html>

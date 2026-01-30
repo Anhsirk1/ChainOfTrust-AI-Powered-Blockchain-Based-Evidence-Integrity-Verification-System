@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Police Department</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+
+<body>
+
+  <section class="showcase">
+    <header>
+      <h2 class="logo">
+        <img src="https://img.icons8.com/ios-filled/100/ffffff/policeman-male.png">Police Department
+      </h2>
+
+      <div class="toggle"></div>
+    </header>
+
+    <video src="{{ url_for('static', filename='index_bg.mp4') }}" muted loop autoplay></video>
+
+
+    <div class="text">
+      <h2>Protecting, Serving</h2>
+      <h3>Building Safer Community</h3>
+      <p>Dedicated to safety, Driven by duty.</p>
+
+      <div class="action-buttons">
+        <a href="#" class="report-btn">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/phone.png" />
+          Report a Crime – 100
+        </a>
+
+        <a href="#" class="chat-btn">
+          <img src="https://img.icons8.com/ios-filled/50/1A1A1A/chat.png" />
+          Live Chat
+        </a>
+      </div>
+    </div>
+
+    <ul class="social">
+      <li><a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/facebook.png"></a></li>
+      <li><a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/twitter.png"></a></li>
+      <li><a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png"></a></li>
+    </ul>
+  </section>
+
+  <!-- Sidebar -->
+  <div class="menu">
+    <ul>
+      <li><a href="home.html"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/home.png"/> Home</a></li>
+
+      <li>
+        <a href="javascript:void(0)" class="dropdown-toggle">
+          <img class="icon" src="https://img.icons8.com/ios-filled/50/000000/services.png"/> Services
+          <span class="arrow">&#9654;</span>
+        </a>
+
+        <ul class="submenu">
+          <li><a href="file_complaint.html"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/complaint.png"/> File Complaint</a></li>
+          <li><a href="fir_status.html"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/checked.png"/> FIR Status</a></li>
+          <li><a href="missing_person.html"><img class="icon" src="https://img.icons8.com/pastel-glyph/64/user-male--v2.png"/> Missing Person</a></li>
+        </ul>
+      </li>
+
+      <li><a href="crime_alerts.html"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/alarm.png"/> Crime Alerts</a></li>
+
+      <li>
+        <a href="javascript:void(0)" class="dropdown-toggle">
+          <img class="icon" src="https://img.icons8.com/ios-filled/50/000000/police-badge.png"/> Officer Login
+          <span class="arrow">&#9654;</span>
+        </a>
+        <ul class="submenu">
+          <li><a href="{{ url_for('admin_login') }}"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/admin-settings-male.png"/> Admin</a></li>
+          <li><a href="{{ url_for('police_login') }}"><img class="icon" src="https://img.icons8.com/ios-filled/100/000000/policeman-male.png"/> Police</a></li>
+          <li><a href="{{ url_for('forensic_login') }}"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/microscope.png"/> Forensic</a></li>
+          <li><a href="{{ url_for('judiciary_login') }}"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/gavel.png"/> Judiciary</a></li>
+        </ul>
+      </li>
+
+      <li><a href="contact.html"><img class="icon" src="https://img.icons8.com/ios-filled/50/000000/contacts.png"/> Contact</a></li>
+    </ul>
+  </div>
+
+  <script>
+    const menuToggle = document.querySelector('.toggle');
+    const showcase = document.querySelector('.showcase');
+    const dropdowns = document.querySelectorAll('.dropdown-toggle');
+
+    menuToggle.addEventListener('click', () => {
+      showcase.classList.toggle('active');
+    });
+
+    dropdowns.forEach(drop => {
+      drop.addEventListener('click', () => {
+        drop.parentElement.classList.toggle('show');
+      });
+    });
+  </script>
+
+</body>
+</html>

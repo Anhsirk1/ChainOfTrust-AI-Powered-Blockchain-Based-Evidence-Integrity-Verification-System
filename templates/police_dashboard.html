@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Dashboard</title>
+
+    <!-- SAME CSS AS ADMIN -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='police_dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🚔</div>
+            <div>
+                <h2>Police Panel</h2>
+                <p>Evidence Chain System</p>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('overview', event)">📊 Overview</div>
+            <div class="nav-item" onclick="switchTab('register', event)">📝 Register FIR</div>
+            <div class="nav-item" onclick="switchTab('upload', event)">📁 Upload Evidence</div>
+            <div class="nav-item" onclick="switchTab('cases', event)">🗂 My FIRs</div>
+            <div class="nav-item" onclick="switchTab('history', event)">📜 Evidence History</div>
+            <div class="nav-item" onclick="switchTab('blockchain', event)">🔗 Blockchain Logs</div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('controllers.logout') }}" class="nav-item">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Police Dashboard</h1>
+                <p class="header-subtitle">
+                    FIR registration, evidence upload & integrity tracking
+                </p>
+            </div>
+
+            <div class="header-right">
+                <button class="icon-btn">🔔</button>
+                <div class="profile">
+                    <div class="avatar">PO</div>
+                    <div>
+                        <div class="name">{{ session.get('fullname', 'Investigating Officer') }}</div>
+                        <div class="role">Police</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CONTENT ================= -->
+        <section class="content">
+
+            <!-- ===== OVERVIEW ===== -->
+            <div id="overview" class="tab active-tab">
+                <div class="grid-2">
+                <!-- LEFT COLUMN -->
+                <div>
+                    <!-- LIVE ALERT BAR -->
+                    <div class="alert-banner">
+                        🚔 AI & Blockchain Evidence Integrity Monitoring Active
+                    </div>
+                    <!-- KPI CARDS -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <h4>Assigned FIRs</h4>
+                            <p>{{ firs|length if firs else 0 }}</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h4>Evidence Uploaded</h4>
+                            <p>{{ evidences }}</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h4>Pending Forensic Review</h4>
+                            <p>{{ pending_forensic }}</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h4>Solved FIR %</h4>
+                            <p>{{ solved_rate }}%</p>
+                        </div>
+                    </div>
+                    <!-- CHARTS PANEL -->
+                    <div class="panel">
+                        <h3>📊 Case Statistics</h3>
+                        <canvas id="firChart"></canvas>
+                    </div>
+                    <!-- BLOCKCHAIN LOG TIMELINE -->
+                    <div class="panel">
+                        <h3>⛓ Blockchain Activity Timeline</h3>
+                        <ul class="timeline">
+                            {% for log in recent_audit %}
+                                <li>
+                                    <span>{{ log.action }}</span>
+                                    <small>{{ log.timestamp.strftime('%d-%m-%Y %H:%M') }}</small>
+                                </li>
+                            {% else %}
+                                <li>No blockchain events recorded</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <!-- RIGHT COLUMN -->
+                <div>
+                    <!-- FORENSIC TRACKER -->
+                    <div class="panel">
+                        <h3>🧪 Forensic Case Tracker</h3>
+                        <ul>
+                            {% for e in recent_evidence %}
+                                <li>
+                                    Evidence {{ e.title }} — FIR {{ e.fir_id }}
+                                    <span class="tag">{{ e.blockchain_status }}</span>
+                                </li>
+                            {% else %}
+                                <li>No forensic cases yet</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <!-- OFFICER PERFORMANCE -->
+                    <div class="panel">
+                        <h3>👮 Officer Performance Leaderboard</h3>
+                        <p>Coming soon (optional AI ranking module)</p>
+                    </div>
+                    <!-- QR + SEAL VERIFICATION -->
+                    <div class="panel">
+                        <h3>🔗 QR / Seal Verification</h3>
+                        <p>Scan seals to verify blockchain integrity</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- ===== REGISTER FIR ===== -->
+            <div id="register" class="tab">
+                <div class="form-card">
+                    <h2>Register FIR</h2>
+                    <form method="POST" action="{{ url_for('controllers.register_fir') }}">
+
+                        <!-- ================= COMPLAINANT DETAILS ================= -->
+                        <h3>Complainant Details</h3>
+                        <label>Full Name</label>
+                        <input type="text" name="complainant_name" required>
+                        <label>Guardian Type</label>
+                        <select name="guardian_type" required>
+                            <option value="">-- Select --</option>
+                            <option value="Father">Father</option>
+                            <option value="Mother">Mother</option>
+                            <option value="Spouse">Spouse</option>
+                        </select>
+                        <label>Guardian Name</label>
+                        <input type="text" name="guardian_name" placeholder="Enter guardian name" required>
+                        <label>Age</label>
+                        <input type="number" name="age" required>
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="">-- Select --</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                        <label>Marital Status</label>
+                        <select name="marital_status">
+                            <option>Single</option>
+                            <option>Married</option>
+                            <option>Other</option>
+                        </select>
+                        <label>Occupation</label>
+                        <input type="text" name="occupation" placeholder="Student / Employee / Business">
+                        <label>Aadhaar Number (Optional)</label>
+                        <input type="text" name="aadhaar" maxlength="12" placeholder="XXXXXXXXXXXX">
+                        <label>Mobile Number</label>
+                        <input type="text" name="mobile" required>
+                        <label>Full Address</label>
+                        <textarea name="address" rows="3" required></textarea>
+
+                        <!-- ================= INCIDENT DETAILS ================= -->
+                        <h3>Incident Details</h3>
+                        <label>Date of Incident</label>
+                        <input type="date" name="incident_date" required>
+                        <label>Time of Incident</label>
+                        <input type="time" name="incident_time" required>
+                        <label>Place of Occurrence</label>
+                        <input type="text" name="location" required>
+                        <label>Police Station</label>
+                        <input type="text" name="police_station" required>
+                        <label>Nature of Offence</label>
+                        <select name="offence_nature" required>
+                            <option>Cognizable</option>
+                            <option>Non-Cognizable</option>
+                        </select>
+                        <label>IPC / CrPC Sections</label>
+                        <input type="text" name="sections" placeholder="e.g. IPC 379, 420" required>
+
+                        <!-- ================= ACCUSED DETAILS ================= -->
+                        <h3>Accused Details</h3>
+                        <label>Accused Known?</label>
+                        <select name="accused_known" required>
+                            <option>No</option>
+                            <option>Yes</option>
+                        </select>
+                        <label>Accused Name (if known)</label>
+                        <input type="text" name="accused_name">
+                        <label>Accused Address (if known)</label>
+                        <textarea name="accused_address" rows="2"></textarea>
+
+                        <!-- ================= DESCRIPTION ================= -->
+                        <h3>Complaint Description</h3>
+                        <label>Brief Description of Offence</label>
+                        <textarea name="description" rows="5" required></textarea>
+                        <button type="submit">Register FIR</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ===== UPLOAD EVIDENCE ===== -->
+            <div id="upload" class="tab">
+            <div class="form-card">
+                <h2>Upload Evidence</h2>
+
+                <!-- FLASH MESSAGES -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST"
+                    action="{{ url_for('controllers.upload_evidence') }}"
+                    enctype="multipart/form-data">
+
+                <!-- FIR -->
+                <div>
+                    <label>Select FIR</label>
+                    <select name="fir_id" required>
+                    <option value="">-- Select FIR --</option>
+                    {% for fir in firs %}
+                        <option value="{{ fir.id }}">{{ fir.fir_number }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Evidence Title -->
+                <div>
+                    <label>Evidence Title</label>
+                    <input type="text"
+                        name="title"
+                        placeholder="Eg: CCTV footage near ATM"
+                        required>
+                </div>
+
+                <!-- Evidence Type -->
+                <div>
+                    <label>Evidence Type</label>
+                    <select name="evidence_type" required>
+                    <option value="">-- Select Type --</option>
+                    <option>Image</option>
+                    <option>Video</option>
+                    <option>Audio</option>
+                    <option>Document</option>
+                    <option>Digital File</option>
+                    </select>
+                </div>
+
+                <!-- Sensitivity -->
+                <div>
+                    <label>Sensitivity Level</label>
+                    <select name="sensitivity">
+                    <option>Normal</option>
+                    <option>Confidential</option>
+                    <option>Highly Confidential</option>
+                    </select>
+                </div>
+
+                <!-- Facility Name -->
+                <div>
+                    <label>Facility Name</label>
+                    <input type="text"
+                        name="facility_name"
+                        placeholder="Central Evidence Storage Facility"
+                        required>
+                </div>
+
+                <!-- Collection Room -->
+                <div>
+                    <label>Collection Room</label>
+                    <input type="text"
+                        name="collection_room"
+                        placeholder="Room 204 / Evidence Intake Room"
+                        required>
+                </div>
+
+                <!-- Storage Type -->
+                <div>
+                    <label>Storage Type</label>
+                    <select name="storage_type" required>
+                    <option value="">-- Select Storage Type --</option>
+                    <option>Rack</option>
+                    <option>Locker</option>
+                    <option>Vault</option>
+                    <option>Cold Storage</option>
+                    <option>Digital Repository</option>
+                    </select>
+                </div>
+
+                <!-- Storage Unit -->
+                <div>
+                    <label>Storage Unit</label>
+                    <input type="text"
+                        name="storage_unit"
+                        placeholder="Rack A / Locker 12">
+                </div>
+
+                <!-- Storage Slot -->
+                <div>
+                    <label>Storage Slot</label>
+                    <input type="text"
+                        name="storage_slot"
+                        placeholder="Slot 3 / Shelf B">
+                </div>
+
+                <!-- Evidence Seal ID (AUTO) -->
+                <div>
+                <label>Evidence Seal ID</label>
+                <input type="text"
+                    name="evidence_seal_id"
+                    value="{{ generated_seal_id }}"
+                    placeholder="SEAL-YYYYMMDD-XXXXXXXX (Auto-generated)"
+                    readonly
+                    class="form-control">
+                </div>
+
+                <!-- Evidence File -->
+                <div>
+                    <label>Evidence File</label>
+                    <input type="file"
+                        name="evidence_file"
+                        required
+                        accept=".jpg,.jpeg,.png,.mp4,.mp3,.pdf,.doc,.docx,.zip">
+                    <small class="hint">Max file size: 20MB</small>
+                </div>
+
+                <!-- Description -->
+                <textarea name="description"
+                            placeholder="Brief description of evidence"
+                            required></textarea>
+
+                <!-- SUBMIT -->
+                <button type="submit" id="uploadBtn">
+                    Upload & Secure Evidence
+                </button>
+
+                </form>
+            </div>
+            </div>
+
+
+            <!-- ===== MY FIRs ===== -->
+            <div id="cases" class="tab">
+
+                <h2>My FIRs</h2>
+
+                {% if firs %}
+                <div class="table-container">
+                    <table class="fir-table">
+                        <thead>
+                            <tr>
+                                <th>FIR Number</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Police station</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fir in firs %}
+                            <tr>
+                                <td><strong>{{ fir.fir_number }}</strong></td>
+                                <td>{{ fir.created_at.strftime('%d-%m-%Y') }}</td>
+                                <td>{{ fir.location }}</td>
+                                <td>{{ fir.police_station }}</td>
+                                <td>
+                                    <span class="status {{ fir.status|lower}}">
+                                        <span class="dot"></span>
+                                        {{ fir.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="openUploadTab('{{ fir.id }}')">
+                                        Upload Evidence
+                                    </button>
+                                    <button class="btn btn-outline view-btn" data-fir='{{ firs_data[loop.index0] | tojson }}'>
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="no-data">No FIRs registered yet.</p>
+                {% endif %}
+            </div>
+
+            <div id="history" class="tab">
+                <div class="table-container">
+                    <h2>Evidence History</h2>
+                    <p class="header-subtitle">
+                        Blockchain-backed evidence records uploaded by you
+                    </p>
+
+                    {% if evidence_history %}
+                    <table class="fir-table">
+                        <thead>
+                            <tr>
+                                <th>FIR No</th>
+                                <th>Evidence Title</th>
+                                <th>Type</th>
+                                <th>Seal ID</th>
+                                <th>File Hash</th>
+                                <th>Uploaded On</th>
+                                <th>Blockchain</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for ev, fir, officer in evidence_history %}
+                            <tr>
+                                <td><strong>{{ fir.fir_number }}</strong></td>
+
+                                <td>{{ ev.title }}</td>
+
+                                <td>{{ ev.evidence_type }}</td>
+
+                                <td>
+                                    <code>{{ ev.evidence_seal_id }}</code>
+                                </td>
+
+                                <td>
+                                    <small>
+                                        {{ ev.file_hash[:12] }}...{{ ev.file_hash[-6:] }}
+                                    </small>
+                                </td>
+
+                                <td>
+                                    {{ ev.uploaded_at.strftime('%d-%m-%Y %H:%M') }}
+                                </td>
+
+                                <td>
+                                    {% if ev.blockchain_status == "Recorded" %}
+                                    <span class="status completed">
+                                        <span class="dot"></span> Anchored
+                                    </span>
+                                    {% else %}
+                                    <span class="status pending">
+                                        <span class="dot"></span> Pending
+                                    </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <a class="btn btn-outline"
+                                    href="{{ url_for('static', filename=ev.file_path.replace('static/','')) }}"
+                                    target="_blank">
+                                    View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <p class="no-data">No evidence uploaded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ===== BLOCKCHAIN ===== -->
+            <div id="blockchain" class="tab">
+                <div class="table-card">
+                    <h2>Blockchain Logs</h2>
+                    <p>Immutable blockchain records for every FIR and evidence action.</p>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<!-- ===== FIR VIEW MODAL (ADD HERE) ===== -->
+<div id="firModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>FIR Details</h3>
+      <button class="close-btn" onclick="closeFirModal()">✕</button>
+    </div>
+
+    <div class="modal-body" id="firModalContent"></div>
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function switchTab(tabId, event) {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active-tab"));
+    document.getElementById(tabId).classList.add("active-tab");
+
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    event.currentTarget.classList.add("active");
+}
+
+function openUploadTab(firId) {
+    // Switch tabs
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active-tab"));
+    document.getElementById("upload").classList.add("active-tab");
+
+    // Sidebar highlight
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    document.querySelectorAll(".nav-item")[2].classList.add("active"); // Upload Evidence nav
+
+    // Auto-select FIR
+    const firSelect = document.querySelector("select[name='fir_id']");
+    if (firSelect) {
+        firSelect.value = firId;
+    }
+}
+
+document.querySelectorAll(".view-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const fir = JSON.parse(btn.dataset.fir);
+    openFirModal(fir);
+  });
+});
+
+function openFirModal(fir) {
+  const modal = document.getElementById("firModal");
+  const content = document.getElementById("firModalContent");
+
+  content.innerHTML = `
+    <div class="fir-view-grid">
+
+      <!-- COMPLAINT DETAILS -->
+      <div class="fir-section">
+        <h4>Complaint Details</h4>
+        <div class="fir-fields">
+          <div><span>FIR Number</span>${fir.fir_number}</div>
+          <div><span>Complainant</span>${fir.complainant_name}</div>
+          <div><span>Guardian</span>${fir.guardian_type} - ${fir.guardian_name}</div>
+          <div><span>Mobile</span>${fir.mobile}</div>
+          <div class="full"><span>Address</span>${fir.address}</div>
+        </div>
+      </div>
+
+      <!-- INCIDENT DETAILS -->
+      <div class="fir-section">
+        <h4>Incident Details</h4>
+        <div class="fir-fields">
+          <div><span>Date</span>${fir.incident_date}</div>
+          <div><span>Time</span>${fir.incident_time}</div>
+          <div><span>Location</span>${fir.location}</div>
+          <div><span>Police Station</span>${fir.police_station}</div>
+        </div>
+      </div>
+
+      <!-- OFFENCE DETAILS -->
+      <div class="fir-section">
+        <h4>Offence Details</h4>
+        <div class="fir-fields">
+          <div><span>Nature</span>${fir.offence_nature}</div>
+          <div><span>Sections</span>${fir.sections}</div>
+        </div>
+      </div>
+
+      <!-- ACCUSED DETAILS -->
+      <div class="fir-section">
+        <h4>Accused Details</h4>
+        <div class="fir-fields">
+          <div><span>Known</span>${fir.accused_known}</div>
+          <div><span>Name</span>${fir.accused_name || "N/A"}</div>
+          <div class="full"><span>Address</span>${fir.accused_address || "N/A"}</div>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="fir-section">
+        <h4>Complaint Description</h4>
+        <p class="fir-description">${fir.description}</p>
+      </div>
+
+    </div>
+  `;
+
+  modal.style.display = "flex";
+}
+
+function closeFirModal() {
+    document.getElementById("firModal").style.display = "none";
+}
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* -------------------------
+     FIR VIEW MODAL HANDLER
+  -------------------------- */
+  document.querySelectorAll(".view-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const fir = JSON.parse(btn.dataset.fir);
+      openFirModal(fir);
+    });
+  });
+
+  /* -------------------------
+     EVIDENCE SEAL PREVIEW
+  -------------------------- */
+  const sealInput = document.getElementById("sealPreview");
+  if (sealInput) {
+    const seal =
+      "SEAL-" +
+      new Date().toISOString().slice(0, 10).replaceAll("-", "") +
+      "-" +
+      Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    sealInput.value = seal;
+  }
+
+});
+</script>
+</body>
+</html>

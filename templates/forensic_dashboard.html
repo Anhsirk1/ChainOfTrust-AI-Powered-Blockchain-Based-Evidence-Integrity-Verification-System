@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forensic Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='forensic_dashboard.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">🧪</div>
+            <h2>Forensic Panel</h2>
+            <p>Evidence Verification System</p>
+        </div>
+
+        <nav class="menu">
+            <div class="nav-item active" onclick="showSection('overview', this)">📊 Overview</div>
+            <div class="nav-item" onclick="showSection('pending', this)">🧾 Pending Evidence</div>
+            <div class="nav-item" onclick="showSection('blockchain', this)">🔗 Blockchain Logs</div>
+            <div class="nav-item" onclick="showSection('archive', this)">📂 Evidence Archive</div>
+            <div class="nav-item" onclick="showSection('tools', this)">🧠 Forensic Tools</div>
+        </nav>
+
+        <a href="{{ url_for('controllers.logout') }}" class="logout">🚪 Logout</a>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div>
+                <h1>Forensic Dashboard</h1>
+                <p>Evidence verification & chain of custody</p>
+            </div>
+            <div class="user-chip">
+                <button class="icon-btn">🔔</button>
+                <span class="avatar">FS</span>
+                <div>
+                    <strong>Forensic Analyst</strong>
+                    <small>Digital Forensics</small>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= OVERVIEW ================= -->
+        <section id="overview" class="section active-section">
+            <div class="stats">
+                <div class="card">
+                    <h4>Pending Evidence</h4>
+                    <span class="stat">{{ evidences|length }}</span>
+                </div>
+                <div class="card">
+                    <h4>Verified Today</h4>
+                    <span class="stat">0</span>
+                </div>
+                <div class="card alert">
+                    <h4>Integrity Alerts</h4>
+                    <span class="stat red">0</span>
+                </div>
+                <div class="card">
+                    <h4>Blockchain Records</h4>
+                    <span class="stat">100%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PENDING ================= -->
+        <section id="pending" class="section">
+
+            <div class="table-card">
+                <h2>🧾 Pending Evidence Review</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seal ID</th>
+                            <th>FIR No</th>
+                            <th>Type</th>
+                            <th>Uploaded By</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for ev in evidences %}
+                        <tr>
+                            <td>{{ ev['seal_id'] }}</td>
+                            <td>{{ ev['fir_no'] }}</td>
+                            <td>{{ ev['evidence_type'] }}</td>
+
+                            <td>
+                                {{ ev['uploaded_by_name'] }}<br>
+                                <small>{{ ev['uploaded_by_role'] }}</small>
+                            </td>
+
+                            <td>
+                                <span class="badge success">{{ ev['status'] }}</span>
+                            </td>
+
+                            <td>
+                                <button class="btn"
+                                    data-file="{{ ev['file_name'] }}"
+                                    onclick="viewEvidence(this.dataset.file)">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align:center;color:#64748b;">
+                                No pending evidence found
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- ================= BLOCKCHAIN ================= -->
+        <section id="blockchain" class="section">
+            <div class="timeline-card">
+                <h2>🔗 Blockchain Logs</h2>
+                <p>Blockchain integration will reflect verified hashes here.</p>
+            </div>
+        </section>
+
+        <!-- ================= ARCHIVE ================= -->
+        <section id="archive" class="section">
+            <div class="table-card">
+                <h2>📂 Evidence Archive</h2>
+                <p>Verified evidences will appear here.</p>
+            </div>
+        </section>
+
+        <!-- ================= TOOLS ================= -->
+        <section id="tools" class="section">
+            <div class="card tool-card">
+                <h2>🔬 Image Forgery Detection</h2>
+                <label>Select Image Evidence</label>
+                <select id="evidenceSelect" class="dropdown">
+                    <option value="">-- Select Evidence --</option>
+                    {% for ev in evidences %}
+                    <option value="{{ ev.file_name }}">
+                        {{ ev.seal_id }} | {{ ev.fir_no }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <button onclick="runTruFor()" class="btn primary">
+                    Run Image Analysis
+                </button>
+
+                <div id="result" class="result-box"></div>
+                </div>
+            
+            <div class="card tool-card">
+                <h2>🎥 Video Forgery Detection</h2>
+
+                <label>Select Video Evidence</label>
+                <select id="videoSelect" class="dropdown">
+                    {% for ev in evidences %}
+                    {% if ev.evidence_type == "Video" %}
+                        <option value="{{ ev.file_name }}">
+                            {{ ev.seal_id }} | {{ ev.fir_no }}
+                        </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+
+                <button onclick="runVideoAnalysis(event)" class="btn primary">
+                    Run Video Analysis
+                </button>
+
+                <div id="videoResult" class="result-box"></div>
+                <div id="videoExtras"></div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div id="evidenceModal" class="modal-overlay">
+    <div class="modal-card large">
+
+        <!-- Close X -->
+        <button class="modal-close" onclick="closeModal()">✕</button>
+
+        <div class="modal-content">
+
+        <!-- IMAGE PREVIEW -->
+        <img id="evidenceImg"
+            style="display:none; max-width:100%; max-height:80vh;">
+
+        <!-- VIDEO PREVIEW -->
+        <video id="evidenceVideo"
+            controls
+            style="display:none; max-width:100%; max-height:80vh;">
+            Your browser does not support video playback.
+        </video>
+
+    </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ================= JS ================= -->
+<script>
+function showSection(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id).classList.add('active-section');
+    el.classList.add('active');
+}
+
+function viewEvidence(fileName) {
+
+    const img = document.getElementById("evidenceImg");
+    const video = document.getElementById("evidenceVideo");
+
+    // Reset
+    img.style.display = "none";
+    video.style.display = "none";
+    video.pause();
+    video.src = "";
+
+    const ext = fileName.split('.').pop().toLowerCase();
+    const path = "/static/uploads/evidence/" + fileName;
+
+    if (["jpg", "jpeg", "png"].includes(ext)) {
+        img.src = path;
+        img.style.display = "block";
+    }
+    else if (["mp4", "webm", "ogg"].includes(ext)) {
+        video.src = path;
+        video.style.display = "block";
+        video.load();
+    }
+    else {
+        alert("Unsupported file type");
+        return;
+    }
+
+    document.getElementById("evidenceModal").style.display = "flex";
+}
+
+function closeModal() {
+    const video = document.getElementById("evidenceVideo");
+    video.pause();
+    video.src = "";
+    document.getElementById("evidenceModal").style.display = "none";
+}
+
+function runTruFor() {
+    const file = document.getElementById("evidenceSelect").value;
+    if (!file) {
+        alert("Please select evidence");
+        return;
+    }
+
+    fetch(`/forensic/run_trufor/${file}`)
+        .then(r => r.json())
+        .then(data => {
+
+            // ✅ MAP verdict → shared CSS
+            const verdictClass =
+                data.verdict === "Authentic" ? "likely-authentic" :
+                data.verdict === "Suspicious" ? "suspicious" :
+                "likely-manipulated";
+
+            // ✅ INTERPRET SCORE LIKE A METRIC
+            const scoreTag =
+                data.score > 0.6 ? "bad" :
+                data.score > 0.3 ? "warn" : "good";
+
+            const scoreLabel =
+                data.score > 0.6 ? "Likely Manipulated" :
+                data.score > 0.3 ? "Suspicious" : "Authentic";
+
+            document.getElementById("result").innerHTML = `
+            <div class="image-result-wrap">
+
+                <h3 style="margin-top: 22px;">Image Forgery Analysis Result</h3>
+
+                <div class="verdict-box ${verdictClass}">
+                    <h2>${data.verdict}</h2>
+                    <p>Risk Level: <b>${data.risk}</b></p>
+                </div>
+
+                <div class="analysis-note">
+                    ⚠ This verdict is based on pixel-level forensic analysis.
+                    It does not confirm intent or scene authenticity.
+                </div>
+
+                <div class="metric-box">
+                    <p>
+                        <b>Forgery Confidence Score:</b>
+                        ${data.score.toFixed(4)}
+                        <span class="metric-tag ${scoreTag}">
+                            ${scoreLabel}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="metric-legend">
+                    <h4>📘 TruFor Score Interpretation</h4>
+
+                    <div class="metric-item">
+                        <b>Forgery Confidence Score</b>
+                        <p>
+                            Represents the probability that regions in the image
+                            were digitally altered using splicing, inpainting,
+                            or AI-based manipulation.
+                        </p>
+                        <p>
+                            ≤ 0.30 → Authentic<br>
+                            0.30 – 0.60 → Suspicious<br>
+                            &gt; 0.60 → Likely Manipulated
+                        </p>
+                    </div>
+                </div>
+
+                <h4 style="margin-top:18px;">📊 Evidence Visualization</h4>
+
+                <div class="gallery">
+                    <div>
+                        <p><b>Original Image</b></p>
+                        <img src="${data.original}" class="result-img">
+                    </div>
+
+                    <div>
+                        <p><b>Forgery Heatmap</b></p>
+                        <img src="${data.heatmap}" class="result-img">
+                    </div>
+
+                    <div>
+                        <p><b>Localization Overlay</b></p>
+                        <img src="${data.overlay}" class="result-img">
+                    </div>
+                </div>
+
+                <h4 style="margin-top:18px;">🔍 Advanced Image Forensics</h4>
+
+                <div class="metric-box">
+                    <p><b>Blur Score:</b> ${data.metrics.blur}</p>
+                    <p><b>Noise Level:</b> ${data.metrics.noise}</p>
+                    <p><b>Edge Density:</b> ${data.metrics.edge_density}</p>
+                    <p><b>Blockiness:</b> ${data.metrics.blockiness}</p>
+                    <p><b>Ringing:</b> ${data.metrics.ringing}</p>
+                    <p><b>Saturation:</b> ${data.metrics.saturation}</p>
+                </div>
+
+                <div class="metric-legend">
+                    <h4>📘 Advanced Image Forensics – Metric Interpretation</h4>
+
+                    <div class="metric-item">
+                        <b>Blur Score</b>
+                        <p>
+                            Quantifies loss of image sharpness caused by resampling,
+                            motion blur, aggressive compression, or AI-based smoothing.
+                        </p>
+                        <p>
+                            &lt; 800 → Natural camera capture<br>
+                            800 – 1400 → Mild processing / recompression<br>
+                            &gt; 1400 → Heavy editing or AI-generated smoothing
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Noise Level</b>
+                        <p>
+                            Measures sensor noise consistency across th image.
+                            Authentic images exhibit natural and uneven noise patterns, while manipulated regions
+                            often suppress or amplify noise unnaturally.
+                        </p>
+                        <p>
+                            0.15 – 0.35 → Natural sensor noise<br>
+                            &lt; 0.15 → Noise suppression (AI / denoising)<br>
+                            &gt; 0.35 → Artificial noise or recompression artifacts
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Edge Density</b>
+                        <p>
+                            Represents the amount of fine structural detail and edge continuity.
+                            AI-generated or heavily edited images typically lose micro-edge detail.
+                        </p>
+                        <p>
+                            &gt; 0.08 → Natural scene detail<br>
+                            0.05 – 0.08 → Possible processing<br>
+                            &lt; 0.05 → Synthetic or over-smoothed content
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Blockiness</b>
+                        <p>
+                            Detects JPEG compression artifacts caused by repeated saving,
+                            editing pipelines, screenshots, or re-encoding.
+                        </p>
+                        <p>
+                            &lt; 0.03 → Original capture<br>
+                            0.03 – 0.06 → Recompressed image<br>
+                            &gt; 0.06 → Heavy recompression or tampering
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Ringing</b>
+                        <p>
+                            Identifies halo artifacts introduced by sharpening,
+                            resizing, neural upscaling, or AI enhancement.
+                        </p>
+                        <p>
+                            &lt; 3.5 → Natural optics<br>
+                            3.5 – 4.5 → Post-processing<br>
+                            &gt; 4.5 → Aggressive enhancement or AI pipeline
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Saturation</b>
+                        <p>
+                            Measures color intensity consistency.
+                            Extreme saturation or desaturation often indicates editing
+                            or AI-based stylization.
+                        </p>
+                        <p>
+                            0.40 – 0.65 → Natural color distribution<br>
+                            &lt; 0.40 or &gt; 0.65 → Edited or synthetic color profile
+                        </p>
+                    </div>
+
+                    <div class="important-note">
+                        <h5>⚠ Important Note</h5>
+                        <ul>
+                            <li>Individual metric anomalies do not confirm manipulation.</li>
+                            <li>Conclusions must be drawn from combined evidence, including heatmaps, metadata, and contextual analysis.</li>
+                        </ul>
+                    </div>
+                    
+                </div>
+
+                <h4 style="margin-top:14px;">📂 EXIF / Metadata Anomalies</h4>
+
+                ${
+                    data.exif.length
+                    ? `<ul class="exif-list">${data.exif.map(e => `<li>⚠ ${e}</li>`).join("")}</ul>`
+                    : `<p style="color:green;">✔ No metadata anomalies detected</p>`
+                }
+                
+                <div class="metric-legend">
+                    <h4>📘 What are EXIF / Metadata Anomalies?</h4>
+
+                    <div class="metric-item">
+                        <b>EXIF Metadata</b>
+                        <p>
+                            EXIF (Exchangeable Image File Format) metadata is information
+                            automatically embedded by cameras and mobile devices at capture time.
+                        </p>
+                        <p>
+                            It may include:
+                            <br>• Camera or device model
+                            <br>• Date & time of capture
+                            <br>• GPS location (if enabled)
+                            <br>• Exposure, ISO, aperture
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Why “Missing EXIF Metadata” is flagged</b>
+                        <p>
+                            When EXIF metadata is completely absent, it often means the image
+                            was processed, exported, or transmitted through software that
+                            strips metadata.
+                        </p>
+                        <p>
+                            Common causes:
+                            <br>• Image editing software (Photoshop, AI tools)
+                            <br>• Messaging apps (WhatsApp, Telegram)
+                            <br>• Screenshots or screen recordings
+                            <br>• Privacy-preserving re-exports
+                        </p>
+                    </div>
+
+                    <div class="important-note">
+                        <h5>⚠ Important Note</h5>
+                        <ul>
+                            <li>Missing EXIF data does not automatically mean forgery.</li>
+                            <li>
+                                It is treated as a contextual anomaly and must be evaluated
+                                alongside visual forensic evidence.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            `;
+        })
+        .catch(() => alert("❌ TruFor execution failed"));
+}
+
+function runVideoAnalysis(event) {
+
+    const file = document.getElementById("videoSelect").value;
+    if (!file) {
+        alert("Select a video");
+        return;
+    }
+
+    const btn = event?.target || document.getElementById("runVideoBtn");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Analyzing...";
+    }
+
+    // ✅ CLEAR OLD UI
+    document.getElementById("videoExtras").innerHTML = "";
+    document.getElementById("videoResult").innerHTML =
+        "<p>⏳ Analyzing video… this may take 1–2 minutes</p>";
+
+    fetch(`/forensic/run_video/${file}`)
+        .then(r => {
+            if (!r.ok) throw new Error("Server error");
+            return r.json();
+        })
+        .then(data => {
+
+            if (data.error) {
+                throw new Error(data.details);
+            }
+
+            // ✅ RESULT SUMMARY
+            const explainHTML = data.reason.map(r => `<li>${r}</li>`).join("");
+
+            document.getElementById("videoResult").innerHTML = `
+            <div class="video-result-wrap">
+                <h3>Video Forgery Analysis Result</h3>
+
+                <div class="verdict-box ${data.verdict.toLowerCase().replace(/\s+/g, "-")}">
+                    <h2>${data.verdict}</h2>
+                    <p>Risk Level: <b>${data.risk}</b></p>
+                </div>
+
+                <div class="analysis-note">
+                    ⚠ This verdict is based on statistical artifact analysis.
+                    It does not confirm intent or content falsification.
+                </div>
+
+                <h4>🔍 Why this verdict?</h4>
+                <ul class="explain">
+                    ${explainHTML}
+                </ul>
+
+                <div class="metric-box">
+                    <p>
+                        <b>Fractal Dimension:</b>
+                        ${data.features.fractal_dim_box_mean.toFixed(3)}
+                        <span class="metric-tag ${
+                            data.features.fractal_dim_box_mean < 1.25 ? 'bad' :
+                            data.features.fractal_dim_box_mean < 1.40 ? 'warn' : 'good'
+                        }">
+                            ${
+                            data.features.fractal_dim_box_mean < 1.25 ? 'Manipulated' :
+                            data.features.fractal_dim_box_mean < 1.40 ? 'Suspicious' : 'Authentic'
+                            }
+                        </span>
+                    </p>
+
+                    <p>
+                        <b>Blockiness:</b>
+                        ${data.features.blockiness_mean.toFixed(3)}
+                        <span class="metric-tag ${
+                            data.features.blockiness_mean > 0.06 ? 'bad' :
+                            data.features.blockiness_mean > 0.03 ? 'warn' : 'good'
+                        }">
+                            ${
+                            data.features.blockiness_mean > 0.06 ? 'Manipulated' :
+                            data.features.blockiness_mean > 0.03 ? 'Suspicious' : 'Authentic'
+                            }
+                        </span>
+                    </p>
+
+                    <p>
+                        <b>Ringing:</b>
+                        ${data.features.ringing_mean.toFixed(2)}
+                        <span class="metric-tag ${
+                            data.features.ringing_mean > 4.5 ? 'bad' :
+                            data.features.ringing_mean > 3.5 ? 'warn' : 'good'
+                        }">
+                            ${
+                            data.features.ringing_mean > 4.5 ? 'Manipulated' :
+                            data.features.ringing_mean > 3.5 ? 'Suspicious' : 'Authentic'
+                            }
+                        </span>
+                    </p>
+                </div>
+
+                <div class="metric-legend">
+                    <h4>📘 Metric Interpretation Guide</h4>
+
+                    <div class="metric-item">
+                        <b>Fractal Dimension</b>
+                        <p>
+                            Measures natural visual complexity.
+                            Lower values indicate smoothing, AI generation,
+                            or aggressive post-processing.
+                        </p>
+                        <p>
+                            ≥ 1.40 → Authentic<br>
+                            1.25 – 1.40 → Suspicious<br>
+                            &lt; 1.25 → Likely Manipulated
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Blockiness</b>
+                        <p>
+                            Detects compression artifacts caused by re-encoding,
+                            video tampering, or low-quality exports.
+                        </p>
+                        <p>
+                            ≤ 0.03 → Authentic<br>
+                            0.03 – 0.06 → Suspicious<br>
+                            &gt; 0.06 → Likely Manipulated
+                        </p>
+                    </div>
+
+                    <div class="metric-item">
+                        <b>Ringing</b>
+                        <p>
+                            Identifies halo artifacts introduced by resizing,
+                            sharpening, or neural upscaling pipelines.
+                        </p>
+                        <p>
+                            ≤ 3.5 → Authentic<br>
+                            3.5 – 4.5 → Suspicious<br>
+                            &gt; 4.5 → Likely Manipulated
+                        </p>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            // ✅ FRAMES + HEATMAPS (CACHE BUST)
+            const base = file.replace(".mp4", "");
+            const ts = Date.now();
+
+            const framesHTML = data.frames.map(f =>
+                `<img src="/static/video_output/${base}/frames/${f}?t=${ts}" class="thumb">`
+            ).join("");
+
+            const heatHTML = data.heatmaps.map(h =>
+                `<img src="/static/video_output/${base}/heatmaps/${h}?t=${ts}" class="thumb">`
+            ).join("");
+
+            const labels = data.timeline.map(t => "F" + t.frame);
+            const risks = data.timeline.map(t => t.risk);
+
+            // ✅ INSERT UI
+            document.getElementById("videoExtras").innerHTML = `
+                <h3>📸 Sampled Frames</h3>
+                <div class="gallery">${framesHTML}</div>
+
+                <h3>🔥 Artifact Heatmaps</h3>
+                <div class="gallery">${heatHTML}</div>
+
+                <h3>📈 Risk Timeline</h3>
+                <canvas id="riskChart"></canvas>
+            `;
+
+            // ✅ CHART LOGIC (CORRECT)
+            if (window.Chart) {
+
+                if (window.riskChart instanceof Chart) {
+                    window.riskChart.destroy();
+                }
+
+                const ctx = document.getElementById("riskChart").getContext("2d");
+
+                window.riskChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Risk Score",
+                            data: risks,
+                            borderWidth: 2,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 10
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                console.error("Chart.js not loaded");
+            }
+
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById("videoResult").innerHTML =
+                `<p style="color:red;">❌ Video analysis failed: ${err.message}</p>`;
+        })
+        .finally(() => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Run Video Analysis";
+            }
+        });
+}
+</script>
+</body>
+</html>

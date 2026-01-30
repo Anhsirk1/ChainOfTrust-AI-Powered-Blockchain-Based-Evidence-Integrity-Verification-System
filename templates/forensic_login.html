@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forensic Login </title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+
+</head>
+<body>
+
+  <!-- Background Video -->
+  <video class="bg-video" autoplay muted loop>
+    <source src="{{ url_for('static', filename='forensic_login_bg.mp4') }}" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <!-- ========================== PAGE CONTENT ========================== -->
+  <div class="container">
+
+    <!-- LEFT PANEL -->
+    <div class="left-box">
+      <img src="https://img.icons8.com/ios-filled/100/ffffff/police-badge.png" alt="Police Badge">
+      <h1>Forensic Department</h1>
+      <p>Secure & Authorized Administrative Access Panel</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- LOGIN CARD -->
+    <div class="login-card">
+      <h2>Forensic Login</h2>
+      <p>Evidence Analysis and Investigation Access</p>
+
+      <form id="loginForm"action="{{ url_for('controllers.login', role='forensic') }}" method="POST">
+
+        <!-- Email -->
+        <label for="email">Forensic ID / Email</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-user left-icon"></i>
+          <input id="email" type="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <!-- Password -->
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <i id="togglePassword" class="fa-regular fa-eye left-icon"></i>
+          <input id="password" type="password" name="password" placeholder="Enter your password" required>
+        </div>
+
+        <!-- Options -->
+        <div class="options-row">
+          <label class="remember-me">
+            <input type="checkbox" id="remember"> Remember me
+          </label>
+          <a href="#" class="forgot-password">Forgot Password?</a>
+        </div>
+
+        <!-- Button -->
+        <button type="submit">
+          <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>Login
+        </button>
+
+      </form>
+
+      <div class="restricted">
+        <strong>⚠ Forensic Access:</strong> All evidence handling is monitored and logged for compliance. 
+      </div>
+
+      <div class="footer">© 2025 Police Department</div>
+
+    </div>
+  </div>
+
+  <!-- ========================== SCRIPT ========================== -->
+  <script>
+    const password = document.getElementById("password");
+    const togglePassword = document.getElementById("togglePassword");
+
+    togglePassword.addEventListener("click", () => {
+      const isHidden = password.type === "password";
+      password.type = isHidden ? "text" : "password";
+
+      togglePassword.classList.toggle("fa-eye");
+      togglePassword.classList.toggle("fa-eye-slash");
+    });
+  </script>
+
+</body>
+</html>
