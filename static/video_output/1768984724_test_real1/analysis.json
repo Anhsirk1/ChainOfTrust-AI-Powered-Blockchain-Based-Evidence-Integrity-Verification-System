@@ -1,0 +1,176 @@
+{
+  "features": {
+    "hurst_dfa": null,
+    "hurst_dfa_r2": null,
+    "edge_density_mean": 0.017973581949869793,
+    "edge_density_std": 0.02985425231653794,
+    "fractal_dim_box_mean": 1.301629040915383,
+    "fractal_dim_box_std": 0.21666964674722475,
+    "fractal_dim_box_r2_mean": 0.99662633419573,
+    "n_samples_used": 12.0,
+    "dct_hf_mean": 0.001514371730045843,
+    "dct_hf_std": 0.0012593489717681733,
+    "fft_hf_mean": 0.0010013565886291054,
+    "fft_hf_std": 0.0005896884546059525,
+    "blockiness_mean": 0.02621152664047526,
+    "blockiness_std": 0.015328902263817201,
+    "ringing_mean": 4.647431370573965,
+    "ringing_std": 1.8212899554218849,
+    "block_var_mean": 945.4887619018555,
+    "block_var_std": 601.3914844495149
+  },
+  "debug": {
+    "version": "0.5.2",
+    "config": {
+      "video": {
+        "fps_target": 8,
+        "max_frames": 600,
+        "open_timeout_msec": 3000,
+        "read_timeout_msec": 3000,
+        "rotation_timeout_sec": 2.0,
+        "rotation_fallback_enable": true,
+        "rotation_angles_allowed": [
+          0,
+          90,
+          180,
+          270
+        ],
+        "min_resolution": [
+          320,
+          240
+        ],
+        "max_resolution": [
+          4096,
+          2160
+        ],
+        "max_consecutive_read_failures": 20
+      },
+      "roi": {
+        "use_mediapipe": true,
+        "detection_confidence": 0.5,
+        "min_roi_side": 48,
+        "std_roi_side": 256,
+        "max_roi_side": 512,
+        "bbox_smoothing_alpha": 0.65,
+        "bbox_padding": 0.15,
+        "center_crop_fraction": 0.62,
+        "blur_threshold": 100.0,
+        "brightness_range": [
+          20.0,
+          235.0
+        ]
+      },
+      "fractal": {
+        "dfa_scales": [
+          8,
+          16,
+          32,
+          64,
+          128,
+          256
+        ],
+        "dfa_min_rsquared": 0.9,
+        "dfa_poly_order": 1,
+        "boxcount_scales": [
+          2,
+          4,
+          8,
+          16,
+          32,
+          64
+        ],
+        "boxcount_min_rsquared": 0.85,
+        "canny_threshold1": 80,
+        "canny_threshold2": 160,
+        "highpass_sigma": 1.2,
+        "theoretical_h_real": 0.7,
+        "theoretical_h_fake": 0.55,
+        "theoretical_d_real": 1.35,
+        "theoretical_d_fake": 1.15
+      },
+      "frequency": {
+        "dct_block_size": 8,
+        "dct_hf_threshold": 5,
+        "fft_hf_ratio": 0.25,
+        "blockiness_grid_size": 8,
+        "ringing_median_ksize": 3,
+        "ringing_laplacian_ksize": 3,
+        "ringing_epsilon_relative": 0.01,
+        "block_var_size": 8,
+        "sample_rate_frames": 10,
+        "nan_handling": "omit"
+      },
+      "statistics": {
+        "enable_bootstrap_ci": true,
+        "bootstrap_n_samples": 100,
+        "bootstrap_confidence": 0.95,
+        "bootstrap_min_data": 80,
+        "enable_surrogate_test": false,
+        "surrogate_n_samples": 50,
+        "surrogate_min_data": 80,
+        "random_seed": 2026
+      },
+      "training": {
+        "model_type": "logistic",
+        "enable_calibration": true,
+        "calibration_method": "isotonic",
+        "cv_folds": 5,
+        "cv_stratify": true,
+        "min_feature_variance": 0.01,
+        "max_feature_correlation": 0.95,
+        "l2_penalty": 1.0,
+        "balance_classes": true
+      },
+      "version": "0.5.2"
+    },
+    "video_metadata": {
+      "rotation_deg": 0,
+      "fps_native": 25.0,
+      "frame_step": 3,
+      "source": "C:/Users/rajar/OneDrive/Desktop/AI-Enabled Blockchain Based Evidence & Integrity Verification System/static/uploads/evidence/1768984724_test_real1.mp4"
+    },
+    "sha256": "bed31cdce76118cbccadb8780fa26d3df65208dcde591c5cb286bff8c5a44e50"
+  },
+  "frames": [
+    "frame_0.jpg",
+    "frame_1.jpg",
+    "frame_2.jpg",
+    "frame_3.jpg",
+    "frame_4.jpg",
+    "frame_5.jpg"
+  ],
+  "heatmaps": [
+    "heatmap_0.jpg",
+    "heatmap_1.jpg",
+    "heatmap_2.jpg",
+    "heatmap_3.jpg",
+    "heatmap_4.jpg",
+    "heatmap_5.jpg"
+  ],
+  "timeline": [
+    {
+      "frame": 0,
+      "risk": 0.98
+    },
+    {
+      "frame": 1,
+      "risk": 0.98
+    },
+    {
+      "frame": 2,
+      "risk": 0.98
+    },
+    {
+      "frame": 3,
+      "risk": 0.98
+    },
+    {
+      "frame": 4,
+      "risk": 0.98
+    },
+    {
+      "frame": 5,
+      "risk": 0.98
+    }
+  ]
+}
