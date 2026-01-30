@@ -1,0 +1,548 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f3f6fa;
+}
+
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    padding: 24px;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 14px rgba(0,0,0,0.05);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+}
+
+.brand-icon {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #1e3a8a, #0f172a);
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    color: white;
+}
+
+.brand h2 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.brand p {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* NAV */
+nav {
+    flex-grow: 1;
+}
+
+.nav-item {
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: 0.25s;
+    color: #475569;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: #e2e8f0;
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, #1e40af, #1e3a8a);
+    color: white;
+    box-shadow: 0 4px 12px rgba(30,64,175,0.3);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+}
+
+/* MAIN */
+.main-content {
+    width: 100%;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+/* HEADER */
+.header {
+    background: white;
+    padding: 18px 24px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-left h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.search-box input {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+.icon-btn {
+    border: none;
+    background: #f1f5f9;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: #1e40af;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 600;
+}
+
+.role {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* CONTENT */
+.tab {
+    display: none;
+}
+.active-tab {
+    display: block;
+}
+
+/* STATS */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.card h3 {
+    font-size: 16px;
+    color: #475569;
+}
+
+.card .value {
+    margin-top: 10px;
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e3a8a;
+}
+/* ================= FIR FORM IMPROVED ================= */
+
+.form-card {
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Section headings */
+.form-card h3 {
+    grid-column: span 2;
+    margin: 26px 0 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e3a8a;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 6px;
+}
+
+/* FIR form grid */
+.form-card form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 28px;
+}
+
+/* Labels */
+.form-card label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Inputs */
+.form-card input,
+.form-card select,
+.form-card textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    font-size: 14px;
+}
+
+/* Textareas full width */
+.form-card textarea {
+    grid-column: span 2;
+    resize: vertical;
+}
+
+/* Button full width */
+.form-card button {
+    grid-column: span 2;
+    margin-top: 20px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1e40af, #1e3a8a);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(30,64,175,0.35);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .form-card form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-card textarea,
+    .form-card button,
+    .form-card h3 {
+        grid-column: span 1;
+    }
+}
+.table-container {
+    margin-top: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    overflow-x: auto;
+}
+
+.fir-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fir-table thead {
+    background: #f4f6fa;
+}
+
+.fir-table th,
+.fir-table td {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.fir-table th {
+    font-weight: 600;
+    color: #333;
+}
+
+.fir-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.fir-table tbody tr:hover {
+    background: #f9fbff;
+}
+
+.btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-right: 6px;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-outline {
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    background: transparent;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.no-data {
+    margin-top: 20px;
+    color: #666;
+}
+/* ================= FIR STATUS WITH DOT (CORRECT) ================= */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* Dot */
+.status .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Status colors — MATCH HTML CLASSES */
+.status.active .dot {
+    background-color: #22c55e; /* Green */
+}
+
+.status.pending .dot {
+    background-color: #f59e0b; /* Orange */
+}
+
+.status.completed .dot {
+    background-color: #3b82f6; /* Blue */
+}
+
+.status.closed .dot {
+    background-color: #ef4444; /* Red */
+}
+
+.status.in-progress .dot {
+    background-color: #6366f1; /* Indigo */
+}
+/* View card of FIR*/
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-card {
+    background: white;
+    width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.close-btn {
+    border: none;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+/* ================= FIR VIEW MODAL UI ================= */
+
+.modal-card {
+    padding: 26px;
+}
+
+/* Grid wrapper */
+.fir-view-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+/* Section card */
+.fir-section {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+/* Section heading */
+.fir-section h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 6px;
+}
+
+/* Two column layout */
+.fir-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 24px;
+}
+
+/* Label + value */
+.fir-fields div {
+    font-size: 14px;
+    color: #0f172a;
+    line-height: 1.5;
+}
+
+.fir-fields span {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+/* Full width rows */
+.fir-fields .full {
+    grid-column: span 2;
+}
+
+/* Description */
+.fir-description {
+    font-size: 14px;
+    color: #1f2937;
+    line-height: 1.7;
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fir-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .fir-fields .full {
+        grid-column: span 1;
+    }
+}
+.grid-2{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:22px;
+}
+
+.alert-banner{
+    background:#111827;
+    color:white;
+    padding:10px 14px;
+    border-radius:12px;
+    margin-bottom:14px;
+    font-weight:600;
+}
+
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.kpi-card{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
+    color:white;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 8px 25px rgba(0,0,0,.2);
+    text-align:center;
+}
+
+.kpi-card p{
+    font-size:30px;
+    font-weight:900;
+}
+
+.panel{
+    background:white;
+    padding:18px;
+    border-radius:16px;
+    margin-top:16px;
+    border:1px solid #e5e7eb;
+}
+
+.timeline li{
+    margin-bottom:8px;
+    padding-left:10px;
+    border-left:3px solid #1e3a8a;
+}
+.tag{
+    background:#1e3a8a;
+    color:white;
+    padding:3px 8px;
+    border-radius:8px;
+    font-size:12px;
+}
